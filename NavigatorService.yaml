@@ -1,0 +1,165 @@
+openapi: 3.0.4
+info:
+  title: Navigator API
+  version: 1.0.0
+  description: API для работы с маршрутами через навигационные операции
+
+servers:
+  - url: http://localhost:8081/navigator
+
+components:
+  schemas:
+    Route:
+      type: object
+      required:
+        - name
+        - coordinates
+        - to
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          minimum: 1
+        name:
+          type: string
+          minLength: 1
+        coordinates:
+          $ref: "#/components/schemas/Coordinates"
+        creationDate:
+          type: string
+          format: date-time
+          readOnly: true
+        from:
+          $ref: "#/components/schemas/FromLocation"
+          nullable: true
+        to:
+          $ref: "#/components/schemas/ToLocation"
+        distance:
+          type: integer
+          minimum: 2
+
+    Coordinates:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: number
+          format: double
+        y:
+          type: number
+          format: float
+
+    FromLocation:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        z:
+          type: number
+          format: float
+          nullable: false
+
+    ToLocation:
+      type: object
+      required:
+        - x
+      properties:
+        x:
+          type: number
+          format: float
+        y:
+          type: number
+          format: double
+        z:
+          type: number
+          format: float
+
+paths:
+  /routes/{id-from}/{id-to}/{order-by}:
+    get:
+      summary: Найти маршруты между указанными локациями и отсортировать по заданному параметру
+      parameters:
+        - in: path
+          name: id-from
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - in: path
+          name: id-to
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - in: path
+          name: order-by
+          required: true
+          schema:
+            type: string
+            enum:
+              - id
+              - name
+              - creationDate
+              - distance
+              - "coordinates.x"
+              - "coordinates.y"
+              - "from.x"
+              - "from.y"
+              - "from.z"
+              - "to.x"
+              - "to.y"
+              - "to.z"
+      responses:
+        "200":
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные параметры запроса
+        "404":
+          description: Локации не найдены
+
+  /route/add/{id-from}/{id-to}/{distance}:
+    post:
+      summary: Добавить новый маршрут между указанными локациями
+      parameters:
+        - in: path
+          name: id-from
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - in: path
+          name: id-to
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - in: path
+          name: distance
+          required: true
+          schema:
+            type: integer
+            minimum: 2
+      responses:
+        "201":
+          description: Маршрут создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные параметры запроса

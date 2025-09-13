@@ -65,20 +65,19 @@ components:
           type: string
           minLength: 1
         coordinates:
-          $ref: '#/components/schemas/Coordinates'
+          $ref: "#/components/schemas/Coordinates"
         creationDate:
           type: string
           format: date-time
           readOnly: true
         from:
-          $ref: '#/components/schemas/FromLocation'
+          $ref: "#/components/schemas/FromLocation"
           nullable: true
         to:
-          $ref: '#/components/schemas/ToLocation'
+          $ref: "#/components/schemas/ToLocation"
         distance:
           type: integer
           minimum: 2
-          nullable: true
 
   parameters:
     pageParam:
@@ -106,14 +105,14 @@ components:
         Параметр сортировки в формате: field1:direction1,field2:direction2,...
         Направление (direction) может быть asc (по возрастанию) или desc (по убыванию). Если направление не указано, то используется asc.
         Допустимые поля для сортировки: id, name, creationDate, distance, coordinates.x, coordinates.y, from.x, from.y, from.z, to.x, to.y, to.z.
-      example: "name:asc;creationDate:desc"
+      example: "name:asc,creationDate:desc"
     filterParam:
       in: query
       name: filter
       schema:
         type: string
       description: Параметры фильтрации в формате field=value
-      example: "name=value;creationDate=value"
+      example: "name=value,creationDate=value"
     idParam:
       in: path
       name: id
@@ -129,20 +128,20 @@ paths:
     get:
       summary: Получить список маршрутов
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/sizeParam'
-        - $ref: '#/components/parameters/sortParam'
-        - $ref: '#/components/parameters/filterParam'
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/sortParam"
+        - $ref: "#/components/parameters/filterParam"
       responses:
-        '200':
+        "200":
           description: Успешный запрос
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Route'
-        '400':
+                  $ref: "#/components/schemas/Route"
+        "400":
           description: Неверные параметры запроса
 
     post:
@@ -152,66 +151,66 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Route'
+              $ref: "#/components/schemas/Route"
       responses:
-        '201':
+        "201":
           description: Маршрут создан
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Route'
-        '400':
+                $ref: "#/components/schemas/Route"
+        "400":
           description: Неверные параметры запроса
 
   /routes/{id}:
     get:
       summary: Получить маршрут по ID
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - $ref: "#/components/parameters/idParam"
       responses:
-        '200':
+        "200":
           description: Успешный запрос
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Route'
-        '400':
+                $ref: "#/components/schemas/Route"
+        "400":
           description: Неверные параметры запроса
-        '404':
+        "404":
           description: Объект не найден
 
     put:
       summary: Обновить маршрут
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - $ref: "#/components/parameters/idParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Route'
+              $ref: "#/components/schemas/Route"
       responses:
-        '200':
+        "200":
           description: Маршрут обновлен
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Route'
-        '400':
+                $ref: "#/components/schemas/Route"
+        "400":
           description: Неверные данные
-        '404':
+        "404":
           description: Объект не найден
 
     delete:
       summary: Удалить маршрут
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - $ref: "#/components/parameters/idParam"
       responses:
-        '204':
+        "204":
           description: Маршрут удален
-        '400':
+        "400":
           description: Неверные параметры запроса
-        '404':
+        "404":
           description: Маршрут не найден
 
   /routes/by-distance/{distance}:
@@ -225,11 +224,11 @@ paths:
             type: integer
             minimum: 2
       responses:
-        '204':
+        "204":
           description: Маршрут удален
-        '400':
+        "400":
           description: Неверные параметры запроса
-        '404':
+        "404":
           description: Маршрут не найден
 
   /routes/search/{substring}:
@@ -243,22 +242,22 @@ paths:
             type: string
             minLength: 1
       responses:
-        '200':
+        "200":
           description: Успешный запрос
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Route'
-        '400':
+                  $ref: "#/components/schemas/Route"
+        "400":
           description: Неверные параметры запроса
 
   /routes/unique-distances:
     get:
       summary: Получить уникальные значения distance
       responses:
-        '200':
+        "200":
           description: Успешный запрос
           content:
             application/json:
