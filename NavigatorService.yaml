@@ -79,6 +79,21 @@ components:
           type: number
           format: float
 
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
 paths:
   /routes/{id-from}/{id-to}/{order-by}:
     get:
@@ -129,6 +144,12 @@ paths:
           description: Неверные параметры запроса
         "404":
           description: Локации не найдены
+        "5xx":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /route/add/{id-from}/{id-to}/{distance}:
     post:
@@ -163,3 +184,9 @@ paths:
                 $ref: "#/components/schemas/Route"
         "400":
           description: Неверные параметры запроса
+        "5xx":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
