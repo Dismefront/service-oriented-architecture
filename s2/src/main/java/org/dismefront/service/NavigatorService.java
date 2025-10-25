@@ -23,17 +23,20 @@ public class NavigatorService {
 
     public RouteListResponseDto findRoutesBetweenLocations(Long idFrom, Long idTo, String orderBy, 
                                                            int page, int size) {
-        // In a real implementation, we would filter routes based on idFrom and idTo
-        // For now, we'll get all routes and simulate the filtering
-        // We'll construct a filter based on from.id and to.id if the Route model had these fields
-        // Since our model doesn't have these fields, we'll just get all routes for demonstration
+        // Get all routes from the Route service
+        List<Route> allRoutes = routeServiceClient.getAllRoutes(0, Integer.MAX_VALUE, null, null);
         
-        // Convert orderBy parameter to sort parameter format expected by RouteService
+        // Filter routes based on idFrom and idTo (simulated since we don't have these fields in Route model)
+        // In a real implementation, we would filter based on actual from/to location IDs
+        List<Route> filteredRoutes = allRoutes;
+        
+        // Sort routes according to the orderBy parameter
+        // Since we can't sort in-memory properly without proper fields, we'll use the service sorting
         String sortParam = convertOrderByToSort(orderBy);
+        List<Route> sortedRoutes = routeServiceClient.getAllRoutes(page, size, sortParam, null);
         
-        List<Route> routes = routeServiceClient.getAllRoutes(page, size, sortParam, null);
-        
-        List<RouteResponseDto> routeDtos = routes.stream()
+        // Convert to DTOs
+        List<RouteResponseDto> routeDtos = sortedRoutes.stream()
                 .map(routeMapper::toResponseDto)
                 .collect(Collectors.toList());
 
@@ -54,6 +57,7 @@ public class NavigatorService {
         route.setDistance(distance);
         // In a real implementation, we would set from and to locations based on idFrom and idTo
         
+        // Use the Route service client to create the route and return the response
         Route createdRoute = routeServiceClient.createRoute(route);
         return routeMapper.toResponseDto(createdRoute);
     }
