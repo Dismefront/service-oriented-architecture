@@ -17,16 +17,9 @@ dependencies {
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.postgresql:postgresql")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    
+
     implementation("org.springframework.boot:spring-boot-starter-validation")
     
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 java {
