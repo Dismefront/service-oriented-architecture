@@ -4,14 +4,14 @@ import lombok.Data;
 import org.dismefront.model.Coordinates;
 import org.dismefront.model.FromLocation;
 import org.dismefront.model.ToLocation;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 public class RouteResponseDto {
     private Long id;
     private String name;
     private Coordinates coordinates;
-    private LocalDateTime creationDate;
+    private Instant creationDate;
     private FromLocation from;
     private ToLocation to;
     private Integer distance;

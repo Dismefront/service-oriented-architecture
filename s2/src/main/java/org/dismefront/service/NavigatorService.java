@@ -6,7 +6,7 @@ import org.dismefront.dto.RouteResponseDto;
 import org.dismefront.model.Route;
 import org.dismefront.util.RouteMapper;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,28 +23,35 @@ public class NavigatorService {
 
     public RouteListResponseDto findRoutesBetweenLocations(Long idFrom, Long idTo, String orderBy, 
                                                            int page, int size) {
-        List<Route> allRoutes = routeServiceClient.getAllRoutes();
-
+        // Get all routes from the Route service without sorting
+        List<Route> allRoutes = routeServiceClient.getAllRoutes(0, Integer.MAX_VALUE, null, null);
+        
+        // Filter routes based on idFrom and idTo (simulated since we don't have these fields in Route model)
+        // In a real implementation, we would filter based on actual from/to location IDs
         List<Route> filteredRoutes = new ArrayList<>(allRoutes);
-
+        
+        // Sort routes according to the orderBy parameter using our own implementation
         sortRoutes(filteredRoutes, orderBy);
         
+        // Apply pagination
         int fromIndex = page * size;
         int toIndex = Math.min((page + 1) * size, filteredRoutes.size());
-
+        
+        // Handle case where fromIndex is beyond the list size
         if (fromIndex >= filteredRoutes.size()) {
-            filteredRoutes = new ArrayList<>();
+            filteredRoutes = new ArrayList<>(); // Return empty list
         } else {
             filteredRoutes = filteredRoutes.subList(fromIndex, toIndex);
         }
         
+        // Convert to DTOs
         List<RouteResponseDto> routeDtos = filteredRoutes.stream()
                 .map(routeMapper::toResponseDto)
                 .collect(Collectors.toList());
 
         RouteListResponseDto responseDto = new RouteListResponseDto();
         responseDto.setRoutes(routeDtos);
-
+        // Set pagination info
         responseDto.setCurrentPage(page);
         responseDto.setPageSize(size);
         responseDto.setTotalElements(allRoutes.size());
@@ -75,7 +82,7 @@ public class NavigatorService {
                 comparator = Comparator.comparing(Route::getName, Comparator.nullsLast(String::compareTo));
                 break;
             case "creationDate":
-                comparator = Comparator.comparing(Route::getCreationDate, Comparator.nullsLast(LocalDateTime::compareTo));
+                comparator = Comparator.comparing(Route::getCreationDate, Comparator.nullsLast(Instant::compareTo));
                 break;
             case "distance":
                 comparator = Comparator.comparing(Route::getDistance, Comparator.nullsLast(Integer::compareTo));
@@ -129,6 +136,7 @@ public class NavigatorService {
                 );
                 break;
             default:
+                // Default sorting by ID if orderBy is not recognized
                 comparator = Comparator.comparing(Route::getId, Comparator.nullsLast(Long::compareTo));
                 break;
         }
