@@ -23,35 +23,28 @@ public class NavigatorService {
 
     public RouteListResponseDto findRoutesBetweenLocations(Long idFrom, Long idTo, String orderBy, 
                                                            int page, int size) {
-        // Get all routes from the Route service without sorting
-        List<Route> allRoutes = routeServiceClient.getAllRoutes(0, Integer.MAX_VALUE, null, null);
-        
-        // Filter routes based on idFrom and idTo (simulated since we don't have these fields in Route model)
-        // In a real implementation, we would filter based on actual from/to location IDs
+        List<Route> allRoutes = routeServiceClient.getAllRoutes();
+
         List<Route> filteredRoutes = new ArrayList<>(allRoutes);
-        
-        // Sort routes according to the orderBy parameter using our own implementation
+
         sortRoutes(filteredRoutes, orderBy);
         
-        // Apply pagination
         int fromIndex = page * size;
         int toIndex = Math.min((page + 1) * size, filteredRoutes.size());
-        
-        // Handle case where fromIndex is beyond the list size
+
         if (fromIndex >= filteredRoutes.size()) {
-            filteredRoutes = new ArrayList<>(); // Return empty list
+            filteredRoutes = new ArrayList<>();
         } else {
             filteredRoutes = filteredRoutes.subList(fromIndex, toIndex);
         }
         
-        // Convert to DTOs
         List<RouteResponseDto> routeDtos = filteredRoutes.stream()
                 .map(routeMapper::toResponseDto)
                 .collect(Collectors.toList());
 
         RouteListResponseDto responseDto = new RouteListResponseDto();
         responseDto.setRoutes(routeDtos);
-        // Set pagination info
+
         responseDto.setCurrentPage(page);
         responseDto.setPageSize(size);
         responseDto.setTotalElements(allRoutes.size());
@@ -136,7 +129,6 @@ public class NavigatorService {
                 );
                 break;
             default:
-                // Default sorting by ID if orderBy is not recognized
                 comparator = Comparator.comparing(Route::getId, Comparator.nullsLast(Long::compareTo));
                 break;
         }

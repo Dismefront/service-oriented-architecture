@@ -17,6 +17,7 @@ dependencies {
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.postgresql:postgresql")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     implementation("org.springframework.boot:spring-boot-starter-validation")
     
