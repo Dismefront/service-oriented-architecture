@@ -6,8 +6,8 @@ import org.dismefront.dto.RouteResponseDto;
 import org.dismefront.model.Route;
 import org.dismefront.util.RouteMapper;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,30 +23,39 @@ public class NavigatorService {
 
     public RouteListResponseDto findRoutesBetweenLocations(Long idFrom, Long idTo, String orderBy, 
                                                            int page, int size) {
-        // Get all routes from the Route service
+        // Get all routes from the Route service without sorting
         List<Route> allRoutes = routeServiceClient.getAllRoutes(0, Integer.MAX_VALUE, null, null);
         
         // Filter routes based on idFrom and idTo (simulated since we don't have these fields in Route model)
         // In a real implementation, we would filter based on actual from/to location IDs
-        List<Route> filteredRoutes = allRoutes;
+        List<Route> filteredRoutes = new ArrayList<>(allRoutes);
         
-        // Sort routes according to the orderBy parameter
-        // Since we can't sort in-memory properly without proper fields, we'll use the service sorting
-        String sortParam = convertOrderByToSort(orderBy);
-        List<Route> sortedRoutes = routeServiceClient.getAllRoutes(page, size, sortParam, null);
+        // Sort routes according to the orderBy parameter using our own implementation
+        sortRoutes(filteredRoutes, orderBy);
+        
+        // Apply pagination
+        int fromIndex = page * size;
+        int toIndex = Math.min((page + 1) * size, filteredRoutes.size());
+        
+        // Handle case where fromIndex is beyond the list size
+        if (fromIndex >= filteredRoutes.size()) {
+            filteredRoutes = new ArrayList<>(); // Return empty list
+        } else {
+            filteredRoutes = filteredRoutes.subList(fromIndex, toIndex);
+        }
         
         // Convert to DTOs
-        List<RouteResponseDto> routeDtos = sortedRoutes.stream()
+        List<RouteResponseDto> routeDtos = filteredRoutes.stream()
                 .map(routeMapper::toResponseDto)
                 .collect(Collectors.toList());
 
         RouteListResponseDto responseDto = new RouteListResponseDto();
         responseDto.setRoutes(routeDtos);
-        // Set pagination info (simplified)
+        // Set pagination info
         responseDto.setCurrentPage(page);
         responseDto.setPageSize(size);
-        responseDto.setTotalElements(routeDtos.size());
-        responseDto.setTotalPages(1);
+        responseDto.setTotalElements(allRoutes.size());
+        responseDto.setTotalPages((int) Math.ceil((double) allRoutes.size() / size));
         
         return responseDto;
     }
@@ -62,35 +71,76 @@ public class NavigatorService {
         return routeMapper.toResponseDto(createdRoute);
     }
     
-    private String convertOrderByToSort(String orderBy) {
-        // Convert NavigatorService orderBy values to RouteService sort format
+    private void sortRoutes(List<Route> routes, String orderBy) {
+        Comparator<Route> comparator = null;
+        
         switch (orderBy) {
             case "id":
-                return "id:asc";
+                comparator = Comparator.comparing(Route::getId, Comparator.nullsLast(Long::compareTo));
+                break;
             case "name":
-                return "name:asc";
+                comparator = Comparator.comparing(Route::getName, Comparator.nullsLast(String::compareTo));
+                break;
             case "creationDate":
-                return "creationDate:asc";
+                comparator = Comparator.comparing(Route::getCreationDate, Comparator.nullsLast(LocalDateTime::compareTo));
+                break;
             case "distance":
-                return "distance:asc";
+                comparator = Comparator.comparing(Route::getDistance, Comparator.nullsLast(Integer::compareTo));
+                break;
             case "coordinates.x":
-                return "coordinates.x:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getCoordinates() != null ? route.getCoordinates().getX() : null,
+                    Comparator.nullsLast(Double::compareTo)
+                );
+                break;
             case "coordinates.y":
-                return "coordinates.y:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getCoordinates() != null ? route.getCoordinates().getY() : null,
+                    Comparator.nullsLast(Float::compareTo)
+                );
+                break;
             case "from.x":
-                return "from.x:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getFrom() != null ? route.getFrom().getX() : null,
+                    Comparator.nullsLast(Integer::compareTo)
+                );
+                break;
             case "from.y":
-                return "from.y:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getFrom() != null ? route.getFrom().getY() : null,
+                    Comparator.nullsLast(Integer::compareTo)
+                );
+                break;
             case "from.z":
-                return "from.z:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getFrom() != null ? route.getFrom().getZ() : null,
+                    Comparator.nullsLast(Float::compareTo)
+                );
+                break;
             case "to.x":
-                return "to.x:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getTo() != null ? route.getTo().getX() : null,
+                    Comparator.nullsLast(Float::compareTo)
+                );
+                break;
             case "to.y":
-                return "to.y:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getTo() != null ? route.getTo().getY() : null,
+                    Comparator.nullsLast(Double::compareTo)
+                );
+                break;
             case "to.z":
-                return "to.z:asc";
+                comparator = Comparator.comparing(
+                    route -> route.getTo() != null ? route.getTo().getZ() : null,
+                    Comparator.nullsLast(Float::compareTo)
+                );
+                break;
             default:
-                return null;
+                // Default sorting by ID if orderBy is not recognized
+                comparator = Comparator.comparing(Route::getId, Comparator.nullsLast(Long::compareTo));
+                break;
         }
+        
+        routes.sort(comparator);
     }
 }
