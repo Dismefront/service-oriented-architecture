@@ -21,8 +21,18 @@ public class RouteServiceClient {
         this.restTemplate = restTemplate;
     }
 
-    public List<Route> getAllRoutes() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(routeServiceUrl + "/routes");
+    public List<Route> getAllRoutes(int page, int size, String sort, String filter) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(routeServiceUrl + "/routes")
+                .queryParam("page", page)
+                .queryParam("size", size);
+
+        if (sort != null && !sort.isEmpty()) {
+            builder.queryParam("sort", sort);
+        }
+
+        if (filter != null && !filter.isEmpty()) {
+            builder.queryParam("filter", filter);
+        }
 
         ResponseEntity<Route[]> response = restTemplate.getForEntity(
                 builder.toUriString(),

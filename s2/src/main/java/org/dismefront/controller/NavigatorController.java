@@ -22,10 +22,12 @@ public class NavigatorController {
             @PathVariable("id-to") Long idTo,
             @PathVariable("order-by") String orderBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         
         RouteListResponseDto routes = navigatorService.findRoutesBetweenLocations(
-                idFrom, idTo, orderBy, page, size);
+                idFrom, idTo, orderBy, page, size
+        );
         return ResponseEntity.ok(routes);
     }
 
@@ -33,7 +35,8 @@ public class NavigatorController {
     public ResponseEntity<RouteResponseDto> addNewRoute(
             @PathVariable("id-from") Long idFrom,
             @PathVariable("id-to") Long idTo,
-            @PathVariable("distance") Integer distance) {
+            @PathVariable("distance") Integer distance
+    ) {
         
         RouteResponseDto route = navigatorService.addNewRoute(idFrom, idTo, distance);
         return ResponseEntity.status(201).body(route);
