@@ -30,12 +30,15 @@ public class RouteServiceClient {
             builder.queryParam("sort", sort);
         }
 
+        String builderUriString = builder.toUriString();
+
+        // КОСТЫЫЫЛЬ
         if (filter != null && !filter.isEmpty()) {
-            builder.queryParam("filter", filter);
+            builderUriString += "&filter=" + filter;
         }
 
         ResponseEntity<Route[]> response = restTemplate.getForEntity(
-                builder.toUriString(),
+                builderUriString,
                 Route[].class
         );
 
@@ -48,13 +51,13 @@ public class RouteServiceClient {
         return response.getBody();
     }
 
-    public Route createRoute(Route route) {
-        String url = routeServiceUrl + "/routes";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Route> request = new HttpEntity<>(route, headers);
-        
-        ResponseEntity<Route> response = restTemplate.postForEntity(url, request, Route.class);
+    public Route createRoute(Long idFrom, Long idTo, Integer distance) {
+        String url = routeServiceUrl + "/routes/add/{fromId}/{toId}/{distance}";
+
+        ResponseEntity<Route> response = restTemplate.postForEntity(
+                url,
+                null, Route.class,
+                idFrom, idTo, distance);
         return response.getBody();
     }
 

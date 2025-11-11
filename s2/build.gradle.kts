@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.dismefront"
-version = "1.0.1"
+version = "1.0.2"
 
 
 repositories {
@@ -25,7 +25,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(18))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 

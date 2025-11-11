@@ -22,7 +22,6 @@ public class NavigatorService {
     }
 
     private String convertOrderByToSort(String orderBy) {
-        // Convert NavigatorService orderBy values to RouteService sort format
         switch (orderBy) {
             case "id":
                 return "id:asc";
@@ -57,7 +56,9 @@ public class NavigatorService {
                                                            int page, int size) {
         String sortParam = convertOrderByToSort(orderBy);
 
-        List<Route> routes = routeServiceClient.getAllRoutes(page, size, sortParam, null);
+        String filter = "from.id=" + idFrom.toString() + ",to.id=" + idTo.toString();
+
+        List<Route> routes = routeServiceClient.getAllRoutes(page, size, sortParam, filter);
 
         List<RouteResponseDto> routeDtos = routes.stream()
                 .map(routeMapper::toResponseDto)
@@ -75,10 +76,7 @@ public class NavigatorService {
     }
 
     public RouteResponseDto addNewRoute(Long idFrom, Long idTo, Integer distance) {
-        Route route = new Route();
-        route.setDistance(distance);
-
-        Route createdRoute = routeServiceClient.createRoute(route);
+        Route createdRoute = routeServiceClient.createRoute(idFrom, idTo, distance);
         return routeMapper.toResponseDto(createdRoute);
     }
     
