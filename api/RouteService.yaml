@@ -1,0 +1,269 @@
+openapi: 3.0.4
+info:
+  title: Route Collection API
+  version: 1.0.0
+  description: API для управления коллекцией объектов Route
+
+servers:
+  - url: http://localhost:8080/api/v1
+
+components:
+  schemas:
+    Coordinates:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: number
+          format: double
+        y:
+          type: number
+          format: float
+
+    FromLocation:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        z:
+          type: number
+          format: float
+          nullable: false
+
+    ToLocation:
+      type: object
+      required:
+        - x
+      properties:
+        x:
+          type: number
+          format: float
+        y:
+          type: number
+          format: double
+        z:
+          type: number
+          format: float
+
+    Route:
+      type: object
+      required:
+        - name
+        - coordinates
+        - to
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          minimum: 1
+        name:
+          type: string
+          minLength: 1
+        coordinates:
+          $ref: "#/components/schemas/Coordinates"
+        creationDate:
+          type: string
+          format: date-time
+          readOnly: true
+        from:
+          $ref: "#/components/schemas/FromLocation"
+          nullable: true
+        to:
+          $ref: "#/components/schemas/ToLocation"
+        distance:
+          type: integer
+          minimum: 2
+
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+      description: Номер страницы пагинации
+    sizeParam:
+      in: query
+      name: size
+      schema:
+        type: integer
+        default: 10
+        minimum: 1
+      description: Размер страницы пагинации
+    sortParam:
+      in: query
+      name: sort
+      schema:
+        type: string
+      description: |
+        Параметр сортировки в формате: field1:direction1,field2:direction2,...
+        Направление (direction) может быть asc (по возрастанию) или desc (по убыванию). Если направление не указано, то используется asc.
+        Допустимые поля для сортировки: id, name, creationDate, distance, coordinates.x, coordinates.y, from.x, from.y, from.z, to.x, to.y, to.z.
+      example: "name:asc,creationDate:desc"
+    filterParam:
+      in: query
+      name: filter
+      schema:
+        type: string
+      description: Параметры фильтрации в формате field=value
+      example: "name=value,creationDate=value"
+    idParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      description: ID маршрута
+
+paths:
+  /routes:
+    get:
+      summary: Получить список маршрутов
+      parameters:
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/sortParam"
+        - $ref: "#/components/parameters/filterParam"
+      responses:
+        "200":
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные параметры запроса
+
+    post:
+      summary: Создать новый маршрут
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Route"
+      responses:
+        "201":
+          description: Маршрут создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные параметры запроса
+
+  /routes/{id}:
+    get:
+      summary: Получить маршрут по ID
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные параметры запроса
+        "404":
+          description: Объект не найден
+
+    put:
+      summary: Обновить маршрут
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Route"
+      responses:
+        "200":
+          description: Маршрут обновлен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные данные
+        "404":
+          description: Объект не найден
+
+    delete:
+      summary: Удалить маршрут
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      responses:
+        "204":
+          description: Маршрут удален
+        "400":
+          description: Неверные параметры запроса
+        "404":
+          description: Маршрут не найден
+
+  /routes/by-distance/{distance}:
+    delete:
+      summary: Удалить маршрут по значению distance
+      parameters:
+        - in: path
+          name: distance
+          required: true
+          schema:
+            type: integer
+            minimum: 2
+      responses:
+        "204":
+          description: Маршрут удален
+        "400":
+          description: Неверные параметры запроса
+        "404":
+          description: Маршрут не найден
+
+  /routes/search/{substring}:
+    get:
+      summary: Поиск маршрутов по подстроке в name
+      parameters:
+        - in: path
+          name: substring
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Route"
+        "400":
+          description: Неверные параметры запроса
+
+  /routes/unique-distances:
+    get:
+      summary: Получить уникальные значения distance
+      responses:
+        "200":
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  minimum: 2
+                  nullable: true
