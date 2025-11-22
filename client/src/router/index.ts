@@ -1,24 +1,26 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
+import RoutePage from '@/pages/RoutePage.vue';
+import NavigatorPage from '@/pages/NavigatorPage.vue';
 
 const router = createRouter({
-  history: createWebHistory('/'),
+  history: createWebHistory(),
   routes: [
     {
-      path: '/',
+      path: '/routes',
       name: 'routes',
-      component: () => import('../views/Route/RoutesView.vue'),
-    },
-    {
-      path: '/edit',
-      name: 'editing',
-      component: () => import('../views/EditRoute.vue'),
+      component: RoutePage,
     },
     {
       path: '/navigator',
       name: 'navigator',
-      component: () => import('../views/Navigator/NavigatorView.vue'),
+      component: NavigatorPage,
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      redirect: 'routes',
     },
   ],
-})
+});
 
-export default router
+export default router;

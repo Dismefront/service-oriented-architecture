@@ -1,79 +1,48 @@
-# Service-Oriented Architecture Client
+# client
 
-This is a Vue.js frontend application that provides a complete interface for interacting with the Route Service and Navigator Service APIs.
+This template should help get you started developing with Vue 3 in Vite.
 
-## Features
+## Recommended IDE Setup
 
-- Full CRUD operations for routes
-- Sorting, filtering, and pagination of route collections
-- Search functionality by route name
-- Navigation between locations with custom sorting
-- Human-readable data display
-- Error handling and user feedback
+[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Project Structure
+## Recommended Browser Setup
 
-```
-src/
-├── api/                 # API clients and data models
-├── components/          # Reusable Vue components
-│   └── Route/           # Route-specific components
-├── router/              # Vue Router configuration
-├── utils/               # Utility functions
-└── views/               # Page-level components
-    ├── Route/           # Route management views
-    └── Navigator/       # Navigation views
-```
+- Chromium-based browsers (Chrome, Edge, Brave, etc.):
+  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
+  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
+- Firefox:
+  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
+  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
 
-## API Integration
+## Type Support for `.vue` Imports in TS
 
-The client application integrates with two backend services:
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-1. **Route Service** (`http://localhost:8080/api/v1`)
-   - Manages route collections
-   - Provides CRUD operations
-   - Supports sorting, filtering, and pagination
+## Customize configuration
 
-2. **Navigator Service** (`http://localhost:8081/navigator`)
-   - Finds routes between locations
-   - Adds new routes between locations
+See [Vite Configuration Reference](https://vite.dev/config/).
 
-## Development Setup
+## Project Setup
 
-```bash
-# Install dependencies
+```sh
 npm install
+```
 
-# Start development server
+### Compile and Hot-Reload for Development
+
+```sh
 npm run dev
+```
 
-# Build for production
+### Type-Check, Compile and Minify for Production
+
+```sh
 npm run build
 ```
 
-## Usage
+### Lint with [ESLint](https://eslint.org/)
 
-1. **Route Management**
-   - View all routes with pagination
-   - Sort routes by any field (ID, name, distance, etc.)
-   - Search routes by name
-   - Create, update, and delete routes
-
-2. **Navigation**
-   - Find routes between specific locations
-   - Add new routes between locations
-   - Sort navigation results
-
-## Error Handling
-
-The application provides comprehensive error handling:
-- Network errors
-- API validation errors
-- User feedback for all operations
-
-## Data Display
-
-All data is presented in human-readable formats:
-- Tables for collections
-- Detailed views for individual items
-- Formatted dates and coordinates
+```sh
+npm run lint
+```

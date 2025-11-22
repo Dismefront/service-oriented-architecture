@@ -1,33 +1,7 @@
-<template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Routes</router-link> |
-      <router-link to="/navigator">Navigator</router-link> |
-      <router-link to="/edit">Edit</router-link>
-    </nav>
-    <router-view />
-  </div>
-</template>
+<script setup lang="ts">
+import './styles.css';
+</script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<template><RouterView /></template>
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+<style scoped></style>
