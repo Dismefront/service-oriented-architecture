@@ -53,8 +53,16 @@ onMounted(() => {
       <input v-model.number="navigatorsStore.page" type="number" placeholder="Page" />
     </div>
     <div class="searchbar">
-      <label>id</label>
-      <input v-model.number="navigatorsStore.idFind" type="number" placeholder="Route id..." />
+      <label>id-from</label>
+      <input
+        v-model.number="navigatorsStore.idFromFind"
+        type="number"
+        placeholder="Route id from..."
+      />
+    </div>
+    <div class="searchbar">
+      <label>id-to</label>
+      <input v-model.number="navigatorsStore.idToFind" type="number" placeholder="Route id to..." />
     </div>
 
     <div class="sorting">

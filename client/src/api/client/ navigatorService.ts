@@ -1,7 +1,7 @@
 import type { Route } from '../interfaces';
 import { fetchApi } from './fetchApi';
 
-export const NAVIGATOR_SERVICE_DEFAULT_URL = 'http://localhost:23169/navigator';
+export const NAVIGATOR_SERVICE_DEFAULT_URL = 'https://localhost:23169/navigator';
 
 export const navigatorClientApi = {
   getRoutesBetweenLocations(props: {

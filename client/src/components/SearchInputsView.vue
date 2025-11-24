@@ -86,6 +86,10 @@ onMounted(() => {
       </select>
     </div>
 
+    <div class="searchbar">
+      <input v-model="routesStore.filterString" type="text" placeholder="Filter routes..." />
+    </div>
+
     <button @click="routesStore.updateRoutes" class="applyBtn">Search</button>
     <button @click="createPopupVisible = true" class="createBtn">Create</button>
 

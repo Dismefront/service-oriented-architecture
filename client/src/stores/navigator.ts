@@ -5,7 +5,8 @@ import { ref } from 'vue';
 
 export const useNavigatorStore = defineStore('navigator', () => {
   const routes = ref<Required<Route>[] | null>(null);
-  const idFind = ref<number | string>(0);
+  const idFromFind = ref<number | string>(0);
+  const idToFind = ref<number | string>(0);
   const orderBy = ref<string>('');
   const page = ref<number>(0);
 
@@ -21,13 +22,26 @@ export const useNavigatorStore = defineStore('navigator', () => {
   function updateRoutes() {
     client
       .getRoutesBetweenLocations({
-        idFrom: idFind.value,
-        idTo: idFind.value,
+        idFrom: idFromFind.value,
+        idTo: idToFind.value,
         orderBy: orderBy.value,
         page: page.value,
       })
-      .then(handleRoutesUpdate);
+      .then(handleRoutesUpdate)
+      .catch(() => {
+        routes.value = [];
+      });
   }
 
-  return { updateRoutes, routes, orderBy, idFind, idFromAdd, idToAdd, distanceAdd, page };
+  return {
+    updateRoutes,
+    routes,
+    orderBy,
+    idFromFind,
+    idToFind,
+    idFromAdd,
+    idToAdd,
+    distanceAdd,
+    page,
+  };
 });

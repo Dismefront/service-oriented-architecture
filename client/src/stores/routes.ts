@@ -9,6 +9,7 @@ export const useRoutesStore = defineStore('routes', () => {
   const size = ref<number>(10);
   const sort = ref<string>('id:asc');
   const queryString = ref<string>('');
+  const filterString = ref<string>('');
 
   const handleRoutesUpdate = (data: Required<Route>[]) => {
     if (data === null) {
@@ -24,6 +25,7 @@ export const useRoutesStore = defineStore('routes', () => {
         page: page.value,
         size: size.value,
         sort: sort.value,
+        filter: filterString.value,
       })
       .then(handleRoutesUpdate);
   }
@@ -32,5 +34,5 @@ export const useRoutesStore = defineStore('routes', () => {
     client.searchBySubstring(queryString.value).then(handleRoutesUpdate);
   }
 
-  return { updateRoutes, page, size, sort, routes, searchBySubstring, queryString };
+  return { updateRoutes, page, size, sort, routes, searchBySubstring, queryString, filterString };
 });
