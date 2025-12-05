@@ -60,9 +60,16 @@ public class RouteServiceClient {
     public Route createRoute(Long idFrom, Long idTo, Integer distance) {
         String url = routeServiceUrl + "/routes/add/{fromId}/{toId}/{distance}";
 
-        ResponseEntity<Route> response = restTemplate.postForEntity(
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Route> response = restTemplate.exchange(
                 url,
-                null, Route.class,
+                HttpMethod.POST,
+                requestEntity,
+                Route.class,
                 idFrom, idTo, distance);
         return response.getBody();
     }
