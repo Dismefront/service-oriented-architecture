@@ -10,5 +10,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("jakarta.platform:jakarta.jakartaee-api:10.0.0")
+    implementation("org.apache.cxf:cxf-spring-boot-starter-jaxws:4.0.4")
     runtimeOnly("org.postgresql:postgresql")
 }
