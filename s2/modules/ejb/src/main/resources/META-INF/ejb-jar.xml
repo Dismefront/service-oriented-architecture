@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/ejb-jar_4_0.xsd"
+         version="4.0">
+         
+    <enterprise-beans>
+        <session>
+            <ejb-name>NavigatorBusinessBean</ejb-name>
+            <business-remote>org.dismefront.ejb.NavigatorBusinessRemote</business-remote>
+            <ejb-class>org.dismefront.ejb.NavigatorBusinessBean</ejb-class>
+            <session-type>Stateless</session-type>
+            <transaction-type>Container</transaction-type>
+        </session>
+    </enterprise-beans>
+    
+    <assembly-descriptor>
+        <container-transaction>
+            <method>
+                <ejb-name>NavigatorBusinessBean</ejb-name>
+                <method-name>*</method-name>
+            </method>
+            <trans-attribute>Required</trans-attribute>
+        </container-transaction>
+    </assembly-descriptor>
+</ejb-jar>

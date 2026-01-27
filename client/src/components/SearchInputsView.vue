@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref, type SelectHTMLAttributes } from 'vue';
 import RouteInfoPopup from './RouteInfoPopup.vue';
 import client from '@/api/client';
 import { useRoutesStore } from '@/stores/routes';
@@ -25,6 +25,40 @@ const sortingMapper = {
   toZ: 'to.z',
 };
 
+enum FilterTypes {
+  Eq,
+  Get,
+  Fet,
+  Range,
+}
+
+interface FilterBase {
+  field: keyof typeof sortingMapper;
+  type: FilterTypes;
+  val1?: string;
+  val2?: string;
+  key: string;
+}
+
+const filtersArray = reactive<FilterBase[]>([]);
+
+const handleAddFilter = () => {
+  filtersArray.push({
+    field: 'id',
+    type: FilterTypes.Eq,
+    val1: '',
+    val2: '',
+    key: crypto.randomUUID(),
+  });
+};
+
+const handleRemoveFilter = (key: string) => {
+  filtersArray.splice(
+    filtersArray.findIndex((v) => v.key === key),
+    1,
+  );
+};
+
 const handleSortParamsChange = () => {
   const sortByVal = sortBySelectRef.value?.value as keyof typeof sortingMapper;
   const sortOrderVal = sortOrderSelectRef.value?.value;
@@ -34,13 +68,63 @@ const handleSortParamsChange = () => {
   console.log(routesStore.sort);
 };
 
+const constructFilterSearchString = () => {
+  const filterParts: string[] = [];
+
+  filtersArray.forEach((filter) => {
+    if (!filter.val1 || (filter.type == FilterTypes.Range && !filter.val2)) return;
+
+    const fieldName = sortingMapper[filter.field];
+
+    switch (filter.type) {
+      case FilterTypes.Eq:
+        if (filter.val1) {
+          filterParts.push(`${fieldName}=${filter.val1}`);
+        }
+        break;
+
+      case FilterTypes.Fet:
+        console.log('<=');
+
+        if (filter.val1) {
+          filterParts.push(`${fieldName}=~${filter.val1}`);
+        }
+        break;
+
+      case FilterTypes.Get:
+        if (filter.val1) {
+          filterParts.push(`${fieldName}=${filter.val1}~`);
+        }
+        console.log('>=');
+        break;
+
+      case FilterTypes.Range:
+        if (filter.val1 && filter.val2) {
+          filterParts.push(`${fieldName}=${filter.val1}~${filter.val2}`);
+        } else if (filter.val1) {
+          filterParts.push(`${fieldName}=${filter.val1}~`);
+        } else if (filter.val2) {
+          filterParts.push(`${fieldName}=~${filter.val2}`);
+        }
+        break;
+    }
+  });
+
+  routesStore.filterString = filterParts.join(',');
+};
+
+const handleSearchButton = () => {
+  constructFilterSearchString();
+  routesStore.updateRoutes();
+};
+
 onMounted(() => {
   handleSortParamsChange();
 });
 </script>
 
 <template>
-  <div class="filters">
+  <div class="inputs-container">
     <div class="searchbar">
       <input v-model="routesStore.queryString" type="text" placeholder="Search routes..." />
       <button
@@ -72,9 +156,7 @@ onMounted(() => {
         <option value="toY">Sort by Y To-Location</option>
         <option value="toZ">Sort by Z To-Location</option>
       </select>
-    </div>
 
-    <div class="sorting">
       <select
         ref="sortOrderSelectRef"
         @change="handleSortParamsChange"
@@ -86,12 +168,74 @@ onMounted(() => {
       </select>
     </div>
 
-    <div class="searchbar">
-      <input v-model="routesStore.filterString" type="text" placeholder="Filter routes..." />
+    <div class="filters">
+      <div class="sorting gp" v-for="filter in filtersArray" v-bind:key="filter.key">
+        <select
+          name=""
+          :value="filter.type"
+          @change="
+            (e: Event) => {
+              filter.type = Number.parseInt((e.target as HTMLSelectElement).value);
+            }
+          "
+        >
+          <option :value="FilterTypes.Eq">=</option>
+          // eslint-disable-next-line vue/no-parsing-error
+          <option :value="FilterTypes.Fet">{{ '<=' }}</option>
+          <option :value="FilterTypes.Get">>=</option>
+          <option :value="FilterTypes.Range">Range</option>
+        </select>
+        <select
+          name=""
+          :value="filter.field"
+          @change="
+            (e: Event) => {
+              filter.field = (e.target as SelectHTMLAttributes).value;
+            }
+          "
+        >
+          <option value="id">ID</option>
+          <option value="name">Name</option>
+          <option value="creationDate">Creation Date</option>
+          <option value="distance">Distance</option>
+          <option value="coordinatesX">X Coordinate</option>
+          <option value="coordinatesY">Y Coordinate</option>
+          <option value="fromX">X From-Location</option>
+          <option value="fromY">Y From-Location</option>
+          <option value="fromZ">Z From-Location</option>
+          <option value="toX">X To-Location</option>
+          <option value="toY">Y To-Location</option>
+          <option value="toZ">Z To-Location</option>
+        </select>
+        <input
+          v-if="filter.type != FilterTypes.Range"
+          class="filterInput"
+          placeholder="value"
+          v-model="filter.val1"
+        />
+        <input
+          v-if="filter.type == FilterTypes.Range"
+          class="filterInput"
+          placeholder="from"
+          v-model="filter.val1"
+        />
+        <input
+          v-if="filter.type == FilterTypes.Range"
+          class="filterInput"
+          placeholder="to"
+          v-model="filter.val2"
+        />
+        <button class="removeBtn" @click="handleRemoveFilter(filter.key)">Remove</button>
+      </div>
+      <button class="createBtn" style="background-color: blue" @click="handleAddFilter">
+        Add filter
+      </button>
     </div>
 
-    <button @click="routesStore.updateRoutes" class="applyBtn">Search</button>
-    <button @click="createPopupVisible = true" class="createBtn">Create</button>
+    <div class="action-buttons">
+      <button @click="handleSearchButton" class="applyBtn">Search</button>
+      <button @click="createPopupVisible = true" class="createBtn">Create</button>
+    </div>
 
     <RouteInfoPopup
       title="Create a route"
@@ -105,16 +249,22 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.filters {
+.inputs-container {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  align-items: center;
+  align-items: left;
+}
+
+.gp {
+  margin: 5px 0;
 }
 
 .searchbar {
   display: flex;
+  flex-direction: row;
   gap: 0.5rem;
 }
 
@@ -125,6 +275,13 @@ onMounted(() => {
   width: 200px;
 }
 
+.filterInput {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100px;
+}
+
 .searchbar button {
   padding: 0.5rem 1rem;
   background: #42b983;
@@ -132,6 +289,11 @@ onMounted(() => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .sorting {
@@ -171,6 +333,16 @@ onMounted(() => {
 .createBtn {
   padding: 0.5rem 1rem;
   background: rgb(0, 153, 0);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.removeBtn {
+  padding: 0.5rem 1rem;
+  background: rgb(153, 18, 0);
   color: white;
   border: none;
   border-radius: 4px;

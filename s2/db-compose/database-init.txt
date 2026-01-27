@@ -1,0 +1,12 @@
+docker run -d \
+  --name postgres_soa \
+  -e POSTGRES_DB=soa \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 \
+  postgres:16
+
+CREATE USER dismefront WITH PASSWORD 'dismefront';
+
+GRANT ALL PRIVILEGES ON DATABASE soa TO dismefront;
+

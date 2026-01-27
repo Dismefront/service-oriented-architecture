@@ -1,7 +1,7 @@
 import type { Coordinates, FromLocation, Route, ToLocation } from '../interfaces';
 import { fetchApi } from './fetchApi';
 
-export const ROUTE_SERVICE_DEFAULT_URL = 'https://localhost:23151/lab2/api/v1';
+export const ROUTE_SERVICE_DEFAULT_URL = 'https://localhost:6767/lab3/api/v1';
 
 export const routerClientApi = {
   getRoutesList(props: {

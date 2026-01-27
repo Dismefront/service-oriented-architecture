@@ -20,6 +20,7 @@ export const useRoutesStore = defineStore('routes', () => {
   };
 
   function updateRoutes() {
+    console.log(filterString.value);
     client
       .getRoutesList({
         page: page.value,
